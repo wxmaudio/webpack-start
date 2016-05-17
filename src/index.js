@@ -1,8 +1,16 @@
 
 if(document.querySelectorAll('a').length){
 	require([],() =>{
-		var Button = require('./components/Button').default;
-	    var button = new Button('google.com');
+		const Button = require('./components/Button').default;
+	    const button = new Button('google.com');
 	    button.render('a');
 	});
+}
+
+if(document.querySelectorAll('h1').length){
+   require([],() =>{
+   		const Header = require('./components/Header').default;
+   		const header = new Header();
+   		header.render('h1');
+   });
 }

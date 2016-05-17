@@ -1,4 +1,5 @@
 var path = require('path');
+var webpack = require('webpack');
 
 var config = {
     //context:__dirname,
@@ -7,15 +8,23 @@ var config = {
       __dirname:false
     },*/
     entry: {
-      index: './src/index.js'
+      index: ['./src/index.js']
     },
     output: {
         path: path.join(__dirname,'dist'),
         publicPath: '/dist/',
-        filename: "bundle.js",
+        filename: "[name].js",
         chunkFilename: "[id].chunk.js"
     },
-    
+
+    plugins:[
+       new webpack.optimize.CommonsChunkPlugin({
+        name:'common',
+        //filename:'commons-[chunkhash].js'
+        children:true,
+        minChunks:2
+       })
+    ],
     //publicPath: path.join(__dirname,'/dist'),
     debug: true,
     module: {
