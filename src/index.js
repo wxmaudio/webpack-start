@@ -1,4 +1,4 @@
-
+import './css/style.less';
 if(document.querySelectorAll('a').length){
 	require([],() =>{
 		const Button = require('./components/Button').default;

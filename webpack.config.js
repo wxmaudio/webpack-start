@@ -1,9 +1,11 @@
 var path = require('path');
 var webpack = require('webpack');
 var CleanPlugin = require('clean-webpack-plugin');
+var ExtractPlugin = require('extract-text-webpack-plugin');
 var production = process.env.NODE_ENV === 'production';
 
 var plugins = [
+  new ExtractPlugin('bundle.css'),// <=== where should content be piped
   new webpack.optimize.CommonsChunkPlugin({
         name:'common',
         //filename: 'commons-[chunkhash].js',
@@ -34,7 +36,7 @@ if(production){
             minChunkSize: 51200, // ~50kb
         }),
 
-        // This plugin minifies all the Javascript code of the final bundle
+        // This plugin minifies all the Javascript code of the final bundle 压缩
         new webpack.optimize.UglifyJsPlugin({
             mangle:   true,
             compress: {
@@ -89,7 +91,8 @@ var config = {
           },
          {
             test: /\.less$/,
-            loader:'style!css!less'
+            //loader:'style!css!less'
+            loader: ExtractPlugin.extract('style', 'css!less'),
           },
           {
             test:/\.html$/,
