@@ -96,7 +96,11 @@ var config = {
           },
           {
             test:/\.html$/,
-            loader:'html'
+            loader:'html',
+          },
+          {
+            test:/\.(gif|jpe?g|png|svg)$/i,
+            loader:'url-loader?limit=10000',
           }
         ]
     },
