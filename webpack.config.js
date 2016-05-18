@@ -84,7 +84,11 @@ var config = {
             {
                 test:/\.js/,
                 loader:'eslint',
-            }
+            },
+            {
+                test:/\.js/,
+                loader:'baggage?[file].html=template&[file].less'
+            },
         ],
         loaders: [
           { 

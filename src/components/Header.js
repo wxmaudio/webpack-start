@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import Mustache from 'mustache';
-import template from './Header.html';
-import './Header.less';
+//import template from './Header.html';
+//import './Header.less';
 
 export default class Header{
 	render(node){

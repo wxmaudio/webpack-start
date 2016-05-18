@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import template from './Button.html';
 import Mustache from 'mustache';
-import './Button.less';
+//import template from './Button.html';
+//import './Button.less';
 
 /*
 * Class Button
