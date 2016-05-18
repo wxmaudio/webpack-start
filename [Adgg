@@ -1,0 +1,89 @@
+[1mdiff --git a/index.html b/index.html[m
+[1mindex 3c28ff6..1b1677d 100644[m
+[1m--- a/index.html[m
+[1m+++ b/index.html[m
+[36m@@ -1,10 +1,11 @@[m
+ <html>[m
+     <head>[m
+         <meta charset="utf-8">[m
+[32m+[m[32m        <link rel="stylesheet" type="text/css" href="dist/bundle.css">[m
+     </head>[m
+     <body>[m
+[31m-    	 <a href="http://www.chinaso.com">werwer</a>[m
+[31m-    	 <h1>sdf</h1>[m
+[32m+[m[41m    [m	[32m <a href="http://www.chinaso.com">werw====</a>[m
+[32m+[m[41m    [m	[32m <h1>sdf33</h1>[m
+     	  <script type="text/javascript" src="dist/common.js" charset="utf-8"></script>[m
+         <script type="text/javascript" src="dist/index.js" charset="utf-8"></script>[m
+     </body>[m
+[1mdiff --git a/package.json b/package.json[m
+[1mindex e926634..170dadb 100644[m
+[1m--- a/package.json[m
+[1m+++ b/package.json[m
+[36m@@ -5,7 +5,7 @@[m
+   "main": "index.js",[m
+   "scripts": {[m
+     "build": "NODE_ENV=production webpack --config webpack.config.js --display modules --display chunks",[m
+[31m-    "dev": "webpack-dev-server --inline --hot"[m
+[32m+[m[32m    "dev": "webpack-dev-server"[m
+   },[m
+   "author": "wuxm",[m
+   "license": "MIT",[m
+[36m@@ -22,6 +22,7 @@[m
+     "less-loader": "^2.2.3",[m
+     "mustache": "^2.2.1",[m
+     "style-loader": "^0.13.1",[m
+[32m+[m[32m    "url-loader": "^0.5.7",[m
+     "webpack": "^1.13.0"[m
+   },[m
+   "dependencies": {[m
+[1mdiff --git a/src/css/style.less b/src/css/style.less[m
+[1mindex 08f093b..12e6483 100644[m
+[1m--- a/src/css/style.less[m
+[1m+++ b/src/css/style.less[m
+[36m@@ -1,4 +1,6 @@[m
+ body {[m
+   font-family: sans-serif;[m
+   background: darken(white, 0.2);[m
+[32m+[m[32m  background-image:url('../images/puppy.jpg');[m
+[32m+[m[32m  background-size:cover;[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/index.js b/src/index.js[m
+[1mindex 07829da..7070ec1 100644[m
+[1m--- a/src/index.js[m
+[1m+++ b/src/index.js[m
+[36m@@ -2,7 +2,7 @@[m [mimport './css/style.less';[m
+ if(document.querySelectorAll('a').length){[m
+ 	require([],() =>{[m
+ 		const Button = require('./components/Button').default;[m
+[31m-	    const button = new Button('google.com');[m
+[32m+[m	[32m    const button = new Button('http://google.com');[m
+ 	    button.render('a');[m
+ 	});[m
+ }[m
+[1mdiff --git a/webpack.config.js b/webpack.config.js[m
+[1mindex f51779c..341839e 100644[m
+[1m--- a/webpack.config.js[m
+[1m+++ b/webpack.config.js[m
+[36m@@ -96,10 +96,17 @@[m [mvar config = {[m
+           },[m
+           {[m
+             test:/\.html$/,[m
+[31m-            loader:'html'[m
+[32m+[m[32m            loader:'html',[m
+[32m+[m[32m          },[m
+[32m+[m[32m          {[m
+[32m+[m[32m            test:/\.(gif|jpe?g|png|svg)$/i,[m
+[32m+[m[32m            loader:'url-loader?limit=10000',[m
+           }[m
+         ][m
+     },[m
+[32m+[m[32m    devServer: {[m
+[32m+[m[32m        hot: true,//热加载[m
+[32m+[m[32m    },[m
+     debug: !production,[m
+     devtool: production ? false : 'eval',[m
+     resolve: {[m
+warning: LF will be replaced by CRLF in package.json.
+The file will have its original line endings in your working directory.

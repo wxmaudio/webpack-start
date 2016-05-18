@@ -80,6 +80,12 @@ var config = {
     //publicPath: path.join(__dirname,'/dist'),
     
     module: {
+        preLoaders :[
+            {
+                test:/\.js/,
+                loader:'eslint',
+            }
+        ],
         loaders: [
           { 
             test: /\.js$/,
