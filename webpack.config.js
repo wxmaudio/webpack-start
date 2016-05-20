@@ -2,6 +2,8 @@ var path = require('path');
 var webpack = require('webpack');
 var CleanPlugin = require('clean-webpack-plugin');
 var ExtractPlugin = require('extract-text-webpack-plugin');
+var OpenBrowserPlugin = require('open-browser-webpack-plugin');
+
 var production = process.env.NODE_ENV === 'production';
 
 var plugins = [
@@ -11,8 +13,17 @@ var plugins = [
         //filename: 'commons-[chunkhash].js',
         children:true,
         minChunks:2
-       })
+       }),
+  new OpenBrowserPlugin({
+          url: 'http://localhost:8080'
+        })
 ];
+console.log(production);
+if(!production){
+    plugins = plugins.concat([
+        
+    ]);
+}
 
 if(production){
   plugins = plugins.concat([
@@ -67,7 +78,8 @@ var config = {
       __dirname:false
     },*/
     entry: {
-      index: ['./src/index.js']
+      index: ['./src/index.js'],
+      log: './src/log.js'
     },
     output: {
         path: path.join(__dirname,'dist'),
@@ -81,10 +93,10 @@ var config = {
     
     module: {
         preLoaders :[
-            {
+           /*{
                 test:/\.js/,
                 loader:'eslint',
-            },
+            },*/
             {
                 test:/\.js/,
                 loader:'baggage?[file].html=template&[file].less'
@@ -102,7 +114,7 @@ var config = {
          {
             test: /\.less$/,
             //loader:'style!css!less'
-            loader: ExtractPlugin.extract('style', 'css!less'),
+            loader: ExtractPlugin.extract('style', 'css!autoprefixer?{browers:"last 2 version"}!less'),
           },
           {
             test:/\.html$/,
