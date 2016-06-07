@@ -2,7 +2,10 @@ var path = require('path');
 var webpack = require('webpack');
 var CleanPlugin = require('clean-webpack-plugin');
 var ExtractPlugin = require('extract-text-webpack-plugin');
-var OpenBrowserPlugin = require('open-browser-webpack-plugin');
+var OpenBrowserPlugin = require('open-browser-webpack-plugin')
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+//var  glob = require('glob');
+var entry = require('./cfg/entry');
 
 var production = process.env.NODE_ENV === 'production';
 
@@ -14,17 +17,32 @@ var plugins = [
         children:true,
         minChunks:2
        }),
-  new OpenBrowserPlugin({
+
+  // This plugins defines various variables that we can set to false
+  // in production to avoid code related to them from being compiled
+  // in our final bundle
+  new webpack.DefinePlugin({
+      __SERVER__:  !production,
+      __DEV__:     !production,
+      __DEVTOOLS__:!production,
+      'process.env':   {
+          BABEL_ENV: JSON.stringify(process.env.NODE_ENV),
+      },
+  }),
+
+  //将页面上的静态文件替换成为打包后的文件
+        new HtmlWebpackPlugin(),
+        new OpenBrowserPlugin({
           url: 'http://localhost:8080'
         })
 ];
-console.log(production);
+//开发环境
 if(!production){
     plugins = plugins.concat([
         
     ]);
 }
-
+//生产环境
 if(production){
   plugins = plugins.concat([
     //production plugins go here
@@ -55,21 +73,10 @@ if(production){
             },
         }),
 
-        // This plugins defines various variables that we can set to false
-        // in production to avoid code related to them from being compiled
-        // in our final bundle
-        new webpack.DefinePlugin({
-            __SERVER__:      !production,
-            __DEVELOPMENT__: !production,
-            __DEVTOOLS__:    !production,
-            'process.env':   {
-                BABEL_ENV: JSON.stringify(process.env.NODE_ENV),
-            },
-        }),
- 
 
     ]);
 }
+
 
 var config = {
     //context:__dirname,
@@ -77,15 +84,19 @@ var config = {
       __filename:false,
       __dirname:false
     },*/
-    entry: {
-      index: ['./src/index.js'],
-      log: './src/log.js'
-    },
+    /*entry: {
+      index: ['./src/app/page1'],
+      log: './src/app/page2',
+      //第三方代码
+     vender:['jquery']
+    },*/
+    entry:entry,
     output: {
-        path: path.join(__dirname,'dist'),
-        publicPath: '/dist/',
-        filename: production ? '[name]-[hash].js':'[name].js',
-        chunkFilename: "[name]-[chunkhash]-chunk.js"
+        path: path.resolve(__dirname,'dist'),
+        publicPath: production?'http://cdn.domain.com':'/dist/',
+        filename: production?'[name]-[hash:6].min.js':'[name]-[hash:6].js',
+        chunkFilename: production?'./chunk/[name]-[chunkhash:6].min.js':'./chunk/[name]-[chunkhash:6].js',
+
     },
 
     plugins:plugins,
@@ -114,7 +125,7 @@ var config = {
          {
             test: /\.less$/,
             //loader:'style!css!less'
-            loader: ExtractPlugin.extract('style', 'css!autoprefixer?{browers:"last 2 version"}!less'),
+            loader: ExtractPlugin.extract('style', 'css!autoprefixer?{browsers:"last 2 version"}!less'),
           },
           {
             test:/\.html$/,
@@ -129,8 +140,18 @@ var config = {
     debug: !production,
     devtool: production ? false : 'eval',
     resolve: {
-    // 现在可以写 require('file') 代替 require('file.js')
-    extensions: ['', '.js', '.json'] 
+        //把node_modules路径添加到resolve search root列表里边，这样就可以直接load npm模块
+        root: [process.cwd() + '/src', process.cwd() + '/node_modules'],
+        //通过别名把用户的一个请求重定向到另一个路径
+        alias:{
+            'jquery':'jquery/dist/jquery.min.js'
+        },
+        // 现在可以写 require('file') 代替 require('file.js')
+        extensions: ['', '.js', '.json'], 
+
+  },externals: {
+    //使用cdn的Jquery
+    //jquery: true
   }
 };
 

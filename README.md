@@ -31,6 +31,12 @@ or
 NODE_ENV=production webpack --config webpack.config.js --display modules --display chunks
 ```
 
+# TODO
+* 将静态文件打包进dist下对应的文件夹中
+* 为不同的页面生成自己的静态文件打包
+* common公用静态文件优化
+
+
 # License
 
 [MIT](http://www.opensource.org/licenses/mit-license.php)
