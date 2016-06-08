@@ -7,9 +7,103 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 //var  glob = require('glob');
 var entry = require('./cfg/entry');
 
+
 var production = process.env.NODE_ENV === 'production';
 
+var fs = require('fs');
+var cheerio = require("cheerio");
+
 var plugins = [
+  function (){//将stats.json写入到dist文件夹中
+    this.plugin("done",function(stats){
+      stats = stats.compilation.getStats().toJson({
+                    hash: true,
+                    publicPath: true,
+                    assets: true,
+                    chunks: false,
+                    modules: false,
+                    source: false,
+                    errorDetails: false,
+                    timings: false
+                });
+       fs.writeFileSync(
+        path.join(__dirname, "dist", "stats.json"),
+        JSON.stringify(stats));
+      var json = {}, chunk;
+                for (var key in stats.assetsByChunkName) {
+                    if (stats.assetsByChunkName.hasOwnProperty(key)) {
+                        chunk = stats.assetsByChunkName[key];
+                        if(Object.prototype.toString.call(chunk)=='[object Array]'){
+                          json[key] = chunk[0];
+                        }else{
+                          json[key] = chunk;
+                        }
+                    }
+                }
+                fs.writeFileSync(
+                    path.join(__dirname, 'dist', 'rev-manifest.json'),
+                    JSON.stringify(json, null, 2)
+                );
+    });
+  },
+/*fs.readFile('./index.html', (err, data) => {
+                    const $ = cheerio.load(data.toString());
+                    $('script[src*=dest]').attr('src', 'dest/bundle.'+stats.hash+'.js');
+                    fs.write('./index.html', $.html(), err => {
+                        !err && console.log('Set has success: '+stats.hash)
+                    })
+                })*/
+  function(){
+    this.plugin("done",function(stats){
+       stats = stats.compilation.getStats().toJson({
+                    hash: true,
+                    publicPath: true,
+                    assets: true,
+                    chunks: false,
+                    modules: false,
+                    source: false,
+                    errorDetails: false,
+                    timings: false
+                });
+
+      var dist = stats.publicPath;
+      
+       fs.readFile('./index.html',function(err,data){
+             var $ = cheerio.load(data.toString());
+              console.log(stats.assetsByChunkName);
+              /*
+              { 'page1/index': [ 'page1/index-59d18d.js', 'bundle.css' ],
+              'page2/log': 'page2/log-59d18d.js',
+              common: 'common-59d18d.js' }
+
+               */
+              for (var key in stats.assetsByChunkName) {
+                    if (stats.assetsByChunkName.hasOwnProperty(key)) {
+                        var chunk = stats.assetsByChunkName[key];
+                        if(Object.prototype.toString.call(chunk)=='[object Array]'){
+                          chunk = chunk[0]  
+                        }
+                        var $s = $('script[src*="'+key+'"]');
+                        var src = $s.attr("src");
+                        if($s.length === 0){
+                          if($('script').length > 0){
+                            $('script').first().before('<script src="'+ dist + chunk + '"></script>');
+                           }else{
+                             $('body').append('<script src="'+ dist + chunk + '"></script>')
+                           }
+                        }else{
+                          $s.attr("src", dist + chunk);
+                        }
+                        
+                    }
+                }
+                console.log($.html());
+                fs.write('./dist/index.html',$.html(),function(err){
+                  !err && console.log('Set has success: '+stats.hash);
+                })
+         })    
+    })
+  },
   new ExtractPlugin('bundle.css'),// <=== where should content be piped
   new webpack.optimize.CommonsChunkPlugin({
         name:'common',
@@ -31,7 +125,7 @@ var plugins = [
   }),
 
   //将页面上的静态文件替换成为打包后的文件
-        new HtmlWebpackPlugin(),
+        //new HtmlWebpackPlugin(),
         new OpenBrowserPlugin({
           url: 'http://localhost:8080'
         })
