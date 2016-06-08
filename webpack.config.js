@@ -6,6 +6,7 @@ var OpenBrowserPlugin = require('open-browser-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 //var  glob = require('glob');
 var entry = require('./cfg/entry');
+var URLHelper = require('./cfg/replaceURL');
 
 
 var production = process.env.NODE_ENV === 'production';
@@ -46,14 +47,7 @@ var plugins = [
                 );
     });
   },
-/*fs.readFile('./index.html', (err, data) => {
-                    const $ = cheerio.load(data.toString());
-                    $('script[src*=dest]').attr('src', 'dest/bundle.'+stats.hash+'.js');
-                    fs.write('./index.html', $.html(), err => {
-                        !err && console.log('Set has success: '+stats.hash)
-                    })
-                })*/
-  function(){
+  function(){//将模板文件中静态资源的引用替换为最新的带版本号的引用
     this.plugin("done",function(stats){
        stats = stats.compilation.getStats().toJson({
                     hash: true,
@@ -66,42 +60,7 @@ var plugins = [
                     timings: false
                 });
 
-      var dist = stats.publicPath;
-      
-       fs.readFile('./index.html',function(err,data){
-             var $ = cheerio.load(data.toString());
-              console.log(stats.assetsByChunkName);
-              /*
-              { 'page1/index': [ 'page1/index-59d18d.js', 'bundle.css' ],
-              'page2/log': 'page2/log-59d18d.js',
-              common: 'common-59d18d.js' }
-
-               */
-              for (var key in stats.assetsByChunkName) {
-                    if (stats.assetsByChunkName.hasOwnProperty(key)) {
-                        var chunk = stats.assetsByChunkName[key];
-                        if(Object.prototype.toString.call(chunk)=='[object Array]'){
-                          chunk = chunk[0]  
-                        }
-                        var $s = $('script[src*="'+key+'"]');
-                        var src = $s.attr("src");
-                        if($s.length === 0){
-                          if($('script').length > 0){
-                            $('script').first().before('<script src="'+ dist + chunk + '"></script>');
-                           }else{
-                             $('body').append('<script src="'+ dist + chunk + '"></script>')
-                           }
-                        }else{
-                          $s.attr("src", dist + chunk);
-                        }
-                        
-                    }
-                }
-                console.log($.html());
-                fs.write('./dist/index.html',$.html(),function(err){
-                  !err && console.log('Set has success: '+stats.hash);
-                })
-         })    
+      URLHelper(stats);   
     })
   },
   new ExtractPlugin('bundle.css'),// <=== where should content be piped
